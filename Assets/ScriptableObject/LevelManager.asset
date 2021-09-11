@@ -1,0 +1,26 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a4667fcfbe9118540b1ac8fe1601cebc, type: 3}
+  m_Name: LevelManager
+  m_EditorClassIdentifier: 
+  collisionCount: 0
+  nextLevelAccess: 0
+  gameStarted: 0
+  highScore: 0
+  wallColors:
+  - {fileID: 2100000, guid: d1100fce7c535f74f96a6aa6df250c25, type: 2}
+  - {fileID: 2100000, guid: 0ade3e82b37732041b92d0d96316da9b, type: 2}
+  - {fileID: 2100000, guid: 066db75a0be5fcf4f9001bbad24ecf12, type: 2}
+  - {fileID: 2100000, guid: ea8e2b704cbce9244a81180705ed309b, type: 2}
+  - {fileID: 2100000, guid: a0cf72bf9598361408213e101764a490, type: 2}
+  - {fileID: 2100000, guid: b276b1c26a6abd84da4dad9ad9174072, type: 2}
+  objCollectedForNextLevel: 5

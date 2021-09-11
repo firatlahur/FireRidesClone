@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!200 &20000000
+ShaderVariantCollection:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: NewShaderVariants
+  m_Shaders:
+  - first: {fileID: 4800000, guid: 5e5eca56e1993e741b41ac9c687d01a5, type: 3}
+    second:
+      variants:
+      - keywords: STEREO_INSTANCING_ON
+        passType: 0
+      - keywords: INSTANCING_ON
+        passType: 8
+      - keywords: _SMOOTHNESS_TEXTURE_ALBEDO_CHANNEL_A
+        passType: 11
+      - keywords: INSTANCING_ON
+        passType: 13
+      - keywords: DIRLIGHTMAP_COMBINED FOG_EXP INSTANCING_ON LIGHTMAP_ON _ADDITIONAL_LIGHTS
+          _ADDITIONAL_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS _MAIN_LIGHT_SHADOWS_CASCADE
+          _MIXED_LIGHTING_SUBTRACTIVE _SHADOWS_SOFT
+        passType: 13
