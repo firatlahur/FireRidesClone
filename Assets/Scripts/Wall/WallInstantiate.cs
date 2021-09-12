@@ -1,45 +1,49 @@
 ﻿using UnityEngine;
 
-public class WallInstantiate : MonoBehaviour
+namespace FireRidesClone.Wall
 {
-    public GameObject wall, wallContainer;
-    public Material[] wallColor;
-
-    private float _wallGap;
-
-    private void Awake()
+    public class WallInstantiate : MonoBehaviour
     {
-        _wallGap = .5f;
-    }
-    void Start()
-    {
-        InstantiateWall();
-    }
+        public GameObject wall, wallContainer;
+        public Material[] wallColor;
 
-    private void InstantiateWall()
-    {
-        float bottomGapCalculator = 0;
-        float topGapCalculator = 0;
-        for (int i = 0; i < 40; i++)
+        private float _wallGap;
+
+        private void Awake()
         {
-            bottomGapCalculator += _wallGap;
-            topGapCalculator += _wallGap;
+            _wallGap = .5f;
+        }
+        void Start()
+        {
+            InstantiateWall();
+        }
 
-
-            GameObject bottomWall = Instantiate(wall, wall.transform.position + new Vector3(0, Random.Range(0, 1f), bottomGapCalculator), Quaternion.identity);
-            bottomWall.transform.GetComponent<MeshRenderer>().material = wallColor[0];
-            bottomWall.transform.name = "Bottom_" + i.ToString();
-            bottomWall.transform.parent = wallContainer.transform;
-
-            GameObject topWall = Instantiate(wall, wall.transform.position + new Vector3(0, Random.Range(7, 7.5f), topGapCalculator), Quaternion.identity);
-            topWall.transform.name = "Top_" + i.ToString();
-            topWall.transform.parent = wallContainer.transform;
-
-            if (i % 2 == 0)
+        private void InstantiateWall()
+        {
+            float bottomGapCalculator = 0;
+            float topGapCalculator = 0;
+            for (int i = 0; i < 40; i++)
             {
-                topWall.transform.GetComponent<MeshRenderer>().material = wallColor[1];
-                bottomWall.transform.GetComponent<MeshRenderer>().material = wallColor[1];
+                bottomGapCalculator += _wallGap;
+                topGapCalculator += _wallGap;
+
+
+                GameObject bottomWall = Instantiate(wall, wall.transform.position + new Vector3(0, Random.Range(0, 1f), bottomGapCalculator), Quaternion.identity);
+                bottomWall.transform.GetComponent<MeshRenderer>().material = wallColor[0];
+                bottomWall.transform.name = "Bottom_" + i.ToString();
+                bottomWall.transform.parent = wallContainer.transform;
+
+                GameObject topWall = Instantiate(wall, wall.transform.position + new Vector3(0, Random.Range(7, 7.5f), topGapCalculator), Quaternion.identity);
+                topWall.transform.name = "Top_" + i.ToString();
+                topWall.transform.parent = wallContainer.transform;
+
+                if (i % 2 == 0)
+                {
+                    topWall.transform.GetComponent<MeshRenderer>().material = wallColor[1];
+                    bottomWall.transform.GetComponent<MeshRenderer>().material = wallColor[1];
+                }
             }
         }
     }
 }
+

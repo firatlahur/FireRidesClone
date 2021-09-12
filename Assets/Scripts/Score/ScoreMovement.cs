@@ -1,42 +1,47 @@
-﻿using System.Collections;
+﻿using FireRidesClone.Wall;
+using System.Collections;
 using UnityEngine;
 
-public class ScoreMovement : MonoBehaviour
+namespace FireRidesClone.Score
 {
-    public GameObject scoreObjTeleportation;
-    public LevelManager levelManager;
-    public WallMovement wallMovm;
-
-    private float _speed;
-    private bool _isPaused;
-    
-
-    void Awake()
+    public class ScoreMovement : MonoBehaviour
     {
-        _speed = wallMovm._speed;
-    }
+        public GameObject scoreObjTeleportation;
+        public LevelManager levelManager;
+        public WallMovement wallMovm;
 
-    private void FixedUpdate()
-    {
-        if(!_isPaused && levelManager.gameStarted)
+        private float _speed;
+        private bool _isPaused;
+
+
+        void Awake()
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, scoreObjTeleportation.transform.position, Time.deltaTime * _speed);
+            _speed = wallMovm._speed;
         }
 
-        if (levelManager.collisionCount == levelManager.objCollectedForNextLevel)
+        private void FixedUpdate()
         {
-            StartCoroutine("ScoreObjPause");
-        }
-    }
+            if (!_isPaused && levelManager.gameStarted)
+            {
+                this.transform.position = Vector3.MoveTowards(this.transform.position, scoreObjTeleportation.transform.position, Time.deltaTime * _speed);
+            }
 
-    private IEnumerator ScoreObjPause()
-    {
-        _speed = 0f;
-        _isPaused = true;
-        yield return new WaitUntil(() => levelManager.nextLevelAccess == true);
-        levelManager.collisionCount = 0;
-        levelManager.nextLevelAccess = false;
-        _speed = wallMovm._speed;
-        _isPaused = false;
+            if (levelManager.collisionCount == levelManager.objCollectedForNextLevel)
+            {
+                StartCoroutine("ScoreObjPause");
+            }
+        }
+
+        private IEnumerator ScoreObjPause()
+        {
+            _speed = 0f;
+            _isPaused = true;
+            yield return new WaitUntil(() => levelManager.nextLevelAccess == true);
+            levelManager.collisionCount = 0;
+            levelManager.nextLevelAccess = false;
+            _speed = wallMovm._speed;
+            _isPaused = false;
+        }
     }
 }
+
