@@ -62,9 +62,7 @@ namespace FireRidesClone.Core
             {
                 if (_rigidBody.drag <= 5f) // check drag when no m1
                 {
-                    Debug.Log("aaa");
                     _rigidBody.drag = 5f;
-                    //  wallMovement._speed = _rigidBody.drag;
                 }
 
                 if (wallMovement.speed >= 5)
