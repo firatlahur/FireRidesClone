@@ -1,21 +1,22 @@
 ﻿using UnityEngine;
+using UnityEngine.Serialization;
 
 namespace FireRidesClone.Wall
 {
     public class WallMovement : MonoBehaviour
     {
-        [HideInInspector] public float _speed;
+        [FormerlySerializedAs("_speed")] [HideInInspector] public float speed;
 
         public GameObject wallTeleportation;
 
-        void Start()
+        private void Start()
         {
-            _speed = 5;
+           speed = 5;
         }
 
-        void FixedUpdate()
+        private void FixedUpdate()
         {
-            this.transform.position = Vector3.MoveTowards(this.transform.position, wallTeleportation.transform.position, Time.fixedDeltaTime * _speed);
+            this.transform.position = Vector3.MoveTowards(this.transform.position, wallTeleportation.transform.position, Time.fixedDeltaTime * speed);
         }
     }
 }

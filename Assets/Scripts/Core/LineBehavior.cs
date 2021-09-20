@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using FireRidesClone.ScriptableObject;
+using UnityEngine;
 
 namespace FireRidesClone.Core
 {
@@ -8,18 +9,24 @@ namespace FireRidesClone.Core
         public LevelManager levelManager;
 
         private bool _isCollided;
-        private int _wallLayer;
+        private const int WallLayer = 8;
 
         private LineRenderer _lineRenderer;
         private GameObject[] _collidedWall;
+        private Rigidbody _playerRigidbody;
+        private bool _isCollidedWallNotNull;
 
         private void Awake()
         {
+            if (_collidedWall != null)
+            {
+                _isCollidedWallNotNull = _collidedWall[0] != null;
+            }
             _lineRenderer = this.transform.GetComponent<LineRenderer>();
             _collidedWall = new GameObject[1];
-
-            _wallLayer = 8;
+            _playerRigidbody = player.transform.GetComponent<Rigidbody>();
         }
+        
         private void Start()
         {
             this.transform.GetComponent<MeshRenderer>().material.EnableKeyword("_EmissionColor");
@@ -27,30 +34,37 @@ namespace FireRidesClone.Core
 
         void Update()
         {
-            if (levelManager.gameStarted)
+            if (!levelManager.gameStarted) return;
+            
+            if(_playerRigidbody.drag > 0 && !Input.GetMouseButton(0))
             {
-                if (Input.GetMouseButton(0))
-                {
-                    LinePosition();
-                }
+                _playerRigidbody.drag -= 1f;
+            }
 
-                if (Input.GetMouseButtonUp(0))
-                {
-                    ResetLinePosition();
-                }
+            if (Input.GetMouseButton(0))
+            {
+                LinePosition();
+            }
+
+            if (Input.GetMouseButtonUp(0))
+            {
+                ResetLinePosition();
             }
         }
+        
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == _wallLayer && !_isCollided && _collidedWall[0] == null)
-            {
-                _collidedWall[0] = other.gameObject;
-                _isCollided = true;
-            }
+            if (other.gameObject.layer != WallLayer || _isCollided || _collidedWall[0] != null) return;
+            
+            _collidedWall[0] = other.gameObject;
+            _isCollided = true;
+            _isCollidedWallNotNull = true;
         }
 
         private void LinePosition()
         {
+            _playerRigidbody.drag += .5f;
+            
             if (!_isCollided)
             {
                 this.transform.Translate(0, 0, .3f);
@@ -58,15 +72,14 @@ namespace FireRidesClone.Core
                 _lineRenderer.SetPosition(1, this.transform.position);
             }
 
-            if (_collidedWall[0] != null)
-            {
-                this.transform.parent = _collidedWall[0].transform.parent;
-                _lineRenderer.SetPosition(1, this.transform.position);
+            if (!_isCollidedWallNotNull) return;
+            
+            this.transform.parent = _collidedWall[0].transform.parent;
+            _lineRenderer.SetPosition(1, this.transform.position);
 
-                if (_lineRenderer.GetPosition(1) == this.transform.position)
-                {
-                    _lineRenderer.SetPosition(0, player.transform.position);
-                }
+            if (_lineRenderer.GetPosition(1) == this.transform.position)
+            {
+                _lineRenderer.SetPosition(0, player.transform.position);
             }
         }
 
@@ -81,6 +94,7 @@ namespace FireRidesClone.Core
 
             _collidedWall[0] = null;
             _isCollided = false;
+            _isCollidedWallNotNull = false;
         }
     }
 }

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using System.Linq;
+using FireRidesClone.ScriptableObject;
 
 namespace FireRidesClone.Wall
 {
@@ -24,7 +25,8 @@ namespace FireRidesClone.Wall
 
             _wallLayer = 8;
         }
-        IEnumerator Start() //because actual walls are instantiated on start so we need a little bit delay here for the list
+
+        private IEnumerator Start() //because actual walls are instantiated on start so we need a little bit delay here for the list
         {
             for (int i = 1; i < wallContainer.transform.childCount; i++)
             {
@@ -59,14 +61,14 @@ namespace FireRidesClone.Wall
                 if (collision.transform.position.y < 2f && _bottomWallValue < 20)
                 {
                     _bottomWallList.RemoveAt(0);
-                    collision.transform.position = new Vector3(0, Random.Range(0, .5f), _bottomWallList.Last().transform.position.z + .5f);
+                    collision.transform.position = new Vector3(0, Random.Range(-.5f, 1f), _bottomWallList.Last().transform.position.z + .5f);
                     _bottomWallList.Add(collision.transform);
                 }
 
                 if (collision.transform.position.y > 2f && _topWallValue < 20)
                 {
                     _topWallList.RemoveAt(0);
-                    collision.transform.position = new Vector3(0, Random.Range(7, 7.5f), _topWallList.Last().transform.position.z + .5f);
+                    collision.transform.position = new Vector3(0, Random.Range(7, 8.5f), _topWallList.Last().transform.position.z + .5f);
                     _topWallList.Add(collision.transform);
                 }
 
@@ -74,14 +76,14 @@ namespace FireRidesClone.Wall
                 if (collision.transform.position.y < 2f && _bottomWallValue >= 20)
                 {
                     _bottomWallList.RemoveAt(0);
-                    collision.transform.position = new Vector3(0, Random.Range(.5f, 1f), _bottomWallList.Last().transform.position.z + .5f);
+                    collision.transform.position = new Vector3(0, Random.Range(.5f, 1.3f), _bottomWallList.Last().transform.position.z + .5f);
                     _bottomWallList.Add(collision.transform);
                 }
 
                 if (collision.transform.position.y > 2f && _topWallValue >= 20)
                 {
                     _topWallList.RemoveAt(0);
-                    collision.transform.position = new Vector3(0, Random.Range(7.5f, 8f), _topWallList.Last().transform.position.z + .5f);
+                    collision.transform.position = new Vector3(0, Random.Range(8.5f, 8.8f), _topWallList.Last().transform.position.z + .5f);
                     _topWallList.Add(collision.transform);
                 }
 
@@ -93,42 +95,45 @@ namespace FireRidesClone.Wall
             }
         }
 
+        // ReSharper disable Unity.PerformanceAnalysis
         private void WallColorChanger()
         {
-            if (levelManager.nextLevelAccess)
+            if (!levelManager.nextLevelAccess) return;
+            
+            for (int i = 0; i < _topWallList.Count; i++)
             {
-                for (int i = 0; i < _topWallList.Count; i++)
+                if (i % 2 == 0)
                 {
-                    if (i % 2 == 0)
-                    {
-                        _topWallList[i].transform.GetComponent<MeshRenderer>().material = levelManager.wallColors[_firstWallColor];
-                    }
-
-                    if (i % 2 != 0)
-                    {
-                        _topWallList[i].transform.GetComponent<MeshRenderer>().material = levelManager.wallColors[_secondWallColor];
-                    }
+                    _topWallList[i].transform.GetComponent<MeshRenderer>().material =
+                        levelManager.wallColors[_firstWallColor];
                 }
 
-                for (int i = 0; i < _bottomWallList.Count; i++)
+                if (i % 2 != 0)
                 {
-                    if (i % 2 == 0)
-                    {
-                        _bottomWallList[i].transform.GetComponent<MeshRenderer>().material = levelManager.wallColors[_firstWallColor];
-                    }
-
-                    if (i % 2 != 0)
-                    {
-                        _bottomWallList[i].transform.GetComponent<MeshRenderer>().material = levelManager.wallColors[_secondWallColor];
-                    }
-                }
-
-                if (_secondWallColor != levelManager.wallColors.Length - 1)
-                {
-                    _firstWallColor += 2;
-                    _secondWallColor += 2;
+                    _topWallList[i].transform.GetComponent<MeshRenderer>().material =
+                        levelManager.wallColors[_secondWallColor];
                 }
             }
+
+            for (int i = 0; i < _bottomWallList.Count; i++)
+            {
+                if (i % 2 == 0)
+                {
+                    _bottomWallList[i].transform.GetComponent<MeshRenderer>().material =
+                        levelManager.wallColors[_firstWallColor];
+                }
+
+                if (i % 2 != 0)
+                {
+                    _bottomWallList[i].transform.GetComponent<MeshRenderer>().material =
+                        levelManager.wallColors[_secondWallColor];
+                }
+            }
+
+            if (_secondWallColor == levelManager.wallColors.Length - 1) return;
+            
+            _firstWallColor += 2;
+            _secondWallColor += 2;
         }
     }
 }

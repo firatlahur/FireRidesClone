@@ -1,5 +1,6 @@
 ﻿using FireRidesClone.Core;
 using System.Collections;
+using FireRidesClone.ScriptableObject;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -27,7 +28,7 @@ namespace FireRidesClone.UI
 
         private void FixedUpdate()
         {
-            if (levelManager.gameStarted && !levelChanger._isGameOver)
+            if (levelManager.gameStarted && !levelChanger.isGameOver)
             {
                 _score += .3f * Time.fixedDeltaTime;
                 _streakTimer += .3f * Time.fixedDeltaTime;
@@ -51,27 +52,25 @@ namespace FireRidesClone.UI
                 _lineMaterial.SetColor("_EmissionColor", Color.yellow * 1f);
             }
 
-            if (levelChanger._isGameOver)
+            if (levelChanger.isGameOver)
             {
                 SetEndGameScore();
             }
-
         }
-
 
         public void WhiteScored()
         {
-            StartCoroutine("WhiteScoreAmountManager");
+            StartCoroutine(nameof(WhiteScoreAmountManager));
         }
 
         public void GreenScored()
         {
-            StartCoroutine("GreenScoreAmountManager");
+            StartCoroutine(nameof(GreenScoreAmountManager));
         }
 
         public void NextLevelScored()
         {
-            StartCoroutine("NextLevelScoreManager");
+            StartCoroutine(nameof(NextLevelScoreManager));
         }
 
         private void SetEndGameScore()

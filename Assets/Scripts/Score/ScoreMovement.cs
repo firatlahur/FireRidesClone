@@ -1,5 +1,6 @@
 ﻿using FireRidesClone.Wall;
 using System.Collections;
+using FireRidesClone.ScriptableObject;
 using UnityEngine;
 
 namespace FireRidesClone.Score
@@ -16,7 +17,7 @@ namespace FireRidesClone.Score
 
         void Awake()
         {
-            _speed = wallMovm._speed;
+            _speed = wallMovm.speed;
         }
 
         private void FixedUpdate()
@@ -28,7 +29,7 @@ namespace FireRidesClone.Score
 
             if (levelManager.collisionCount == levelManager.objCollectedForNextLevel)
             {
-                StartCoroutine("ScoreObjPause");
+                StartCoroutine(nameof(ScoreObjPause));
             }
         }
 
@@ -39,7 +40,7 @@ namespace FireRidesClone.Score
             yield return new WaitUntil(() => levelManager.nextLevelAccess == true);
             levelManager.collisionCount = 0;
             levelManager.nextLevelAccess = false;
-            _speed = wallMovm._speed;
+            _speed = wallMovm.speed;
             _isPaused = false;
         }
     }

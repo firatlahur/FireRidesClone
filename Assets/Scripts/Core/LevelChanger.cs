@@ -1,14 +1,16 @@
 ﻿using FireRidesClone.Score;
+using FireRidesClone.ScriptableObject;
 using FireRidesClone.UI;
 using FireRidesClone.Wall;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace FireRidesClone.Core
 {
     public class LevelChanger : MonoBehaviour
     {
-        [HideInInspector] public bool _isGameOver;
+        [HideInInspector] public bool isGameOver;
 
         public LevelManager levelManager;
         public GameObject player, line, wallContainer, scoreContainer;
@@ -45,25 +47,25 @@ namespace FireRidesClone.Core
 
         private void Update()
         {
-            if (levelManager.collisionCount == levelManager.objCollectedForNextLevel && !_isGameOver)
+            if (levelManager.collisionCount == levelManager.objCollectedForNextLevel && !isGameOver)
             {
-                this.transform.position = Vector3.MoveTowards(this.transform.position, player.transform.position, Time.deltaTime * _speed);
+                this.transform.position = Vector3.MoveTowards(this.transform.position, player.transform.position,
+                    Time.deltaTime * _speed);
             }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == _playerLayer)
-            {
-                levelManager.nextLevelAccess = true;
-                scoreText.NextLevelScored();
-                this.transform.position = _startPos;
-            }
+            if (other.gameObject.layer != _playerLayer) return;
+
+            levelManager.nextLevelAccess = true;
+            scoreText.NextLevelScored();
+            this.transform.position = _startPos;
         }
 
         public void GameOver()
         {
-            _isGameOver = true;
+            isGameOver = true;
 
             _playerKinematic.isKinematic = true;
 

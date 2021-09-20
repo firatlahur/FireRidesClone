@@ -2,6 +2,7 @@
 using FireRidesClone.Wall;
 using System.Collections;
 using System.Collections.Generic;
+using FireRidesClone.ScriptableObject;
 using UnityEngine;
 
 namespace FireRidesClone.Core
@@ -15,73 +16,77 @@ namespace FireRidesClone.Core
         public ScoreText scoreText;
 
         private Rigidbody _rigidBody;
-        private LineRenderer lineRend;
+        private LineRenderer _lineRend;
         private List<Collider> _colliderTurnedOffList;
 
-        private float _maxGravityLimit;
         private bool _isCollided;
-        private int _whiteScoreLayer, _greenScoreLayer, _wallLayer;
+        private const int WhiteScoreLayer = 12, GreenScoreLayer = 13, WallLayer = 8;
 
         private void Awake()
         {
             _colliderTurnedOffList = new List<Collider>();
 
             _rigidBody = this.transform.GetComponent<Rigidbody>();
-            lineRend = lineObj.GetComponent<LineRenderer>();
-
-            _maxGravityLimit = 1.3f;
-
-            _whiteScoreLayer = 12;
-            _greenScoreLayer = 13;
-            _wallLayer = 8;
+            _lineRend = lineObj.GetComponent<LineRenderer>();
         }
+
         private void Start()
         {
             this.transform.GetComponent<MeshRenderer>().material.EnableKeyword("_EmissionColor");
+            wallMovement.speed = 5f;
         }
-        void Update()
+        
+        void FixedUpdate()
         {
-            if (levelManager.gameStarted)
+            if (!levelManager.gameStarted) return;
+            
+            if (Input.GetMouseButton(0))
             {
-                if (_rigidBody.velocity.magnitude > _maxGravityLimit)
-                {
-                    _rigidBody.velocity = _rigidBody.velocity.normalized * _maxGravityLimit;
-                }
+                WallSpeed();
 
-                if (Input.GetMouseButton(0))
+                float drag = _rigidBody.drag;
+                
+                if (LinePos(this.gameObject, lineObj))
                 {
-
-                    if (wallMovement._speed < 5 && lineObj.transform.parent != this.transform)
-                    {
-                        wallMovement._speed += 1f;
-                    }
-                    WallSpeed();
+                    drag += .5f * Time.fixedDeltaTime;
+                    _rigidBody.drag = drag;
+                    wallMovement.speed += drag / 5f * Time.fixedDeltaTime;
                 }
                 else
                 {
+                    _rigidBody.drag += .1f * Time.fixedDeltaTime;
+                    wallMovement.speed += drag / 5f * Time.fixedDeltaTime;
+                }
+            }
+            else
+            {
+                if (_rigidBody.drag <= 5f) // check drag when no m1
+                {
+                    Debug.Log("aaa");
+                    _rigidBody.drag = 5f;
+                    //  wallMovement._speed = _rigidBody.drag;
+                }
 
-                    if (wallMovement._speed > 5 && lineObj.transform.parent == this.transform)
-                    {
-                        wallMovement._speed -= 1f;
-                    }
+                if (wallMovement.speed >= 5)
+                {
+                    wallMovement.speed = 5f;
                 }
             }
         }
 
         private void OnTriggerEnter(Collider other)
         {
-            if (other.gameObject.layer == _wallLayer)
+            switch (other.gameObject.layer)
             {
-                levelChanger.GameOver();
-            }
-
-            if (other.gameObject.layer == _whiteScoreLayer && other.gameObject.layer != _greenScoreLayer && !_isCollided)
-            {
-                WhiteHit(other);
-            }
-            else if (other.gameObject.layer == _greenScoreLayer && other.gameObject.layer != _whiteScoreLayer && !_isCollided)
-            {
-                GreenHit(other);
+                case WallLayer:
+                    levelChanger.GameOver();
+                    break;
+                case WhiteScoreLayer when other.gameObject.layer != GreenScoreLayer && !_isCollided:
+                    WhiteHit(other);
+                    break;
+                case GreenScoreLayer when other.gameObject.layer != WhiteScoreLayer && !_isCollided:
+                    GreenHit(other);
+                    break;
             }
         }
 
@@ -98,7 +103,7 @@ namespace FireRidesClone.Core
             _colliderTurnedOffList.Add(whiteScore);
             _colliderTurnedOffList.Add(whiteScore.transform.GetChild(0).GetComponent<SphereCollider>());
 
-            StartCoroutine("ColliderTurnOn");
+            StartCoroutine(nameof(ColliderTurnOn));
         }
 
         private void GreenHit(Collider greenScore)
@@ -106,15 +111,20 @@ namespace FireRidesClone.Core
             _isCollided = true;
 
             greenScore.transform.GetComponent<SphereCollider>().enabled = false;
-            greenScore.transform.GetComponent<MeshRenderer>().enabled = false;
-            greenScore.transform.parent.GetComponent<MeshRenderer>().enabled = false;
+            Transform green;
+            (green = greenScore.transform).GetComponent<MeshRenderer>().enabled = false;
+            
+            
+            Transform whiteScore = green.parent;
+            
+            whiteScore.GetComponent<MeshRenderer>().enabled = false;
 
             scoreText.GreenScored();
 
             _colliderTurnedOffList.Add(greenScore);
-            _colliderTurnedOffList.Add(greenScore.transform.parent.GetComponent<SphereCollider>());
+            _colliderTurnedOffList.Add(whiteScore.GetComponent<SphereCollider>());
 
-            StartCoroutine("ColliderTurnOn");
+            StartCoroutine(nameof(ColliderTurnOn));
         }
 
         private IEnumerator ColliderTurnOn()
@@ -128,40 +138,31 @@ namespace FireRidesClone.Core
             }
             _colliderTurnedOffList.Clear();
             _isCollided = false;
-            StopCoroutine("ColliderTurnOn");
+            StopCoroutine(nameof(ColliderTurnOn));
         }
 
-        public void WallSpeed()
+        private void WallSpeed()
         {
-            if (LinePos(this.gameObject, lineObj)) //player is behind the line
+            if (LinePos(gameObject, lineObj)) //player is behind the line
             {
-                wallMovement._speed += .15f;
+                
 
                 this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position,
-                                                                         new Vector3(0, lineRend.GetPosition(1).y, 0),
-                                                                         1f * Time.deltaTime);
+                                                                         new Vector3(0, _lineRend.GetPosition(1).y, 0),
+                                                                         1.5f * Time.deltaTime);
             }
             else
             {
-                wallMovement._speed -= .15f;
 
                 this.gameObject.transform.position = Vector3.MoveTowards(this.gameObject.transform.position,
-                                                                         new Vector3(0, lineRend.GetPosition(1).y, 0),
+                                                                         new Vector3(0, _lineRend.GetPosition(1).y, 0),
                                                                          4.5f * Time.deltaTime);
             }
         }
 
-        public bool LinePos(GameObject player, GameObject line)
+        private static bool LinePos(GameObject player, GameObject line)
         {
-            bool playerIsBehindLine;
-            if (line.transform.position.z > player.transform.position.z)
-            {
-                playerIsBehindLine = true; //in front of the line
-            }
-            else
-            {
-                playerIsBehindLine = false; //behind the line
-            }
+            bool playerIsBehindLine = line.transform.position.z > player.transform.position.z;
             return playerIsBehindLine;
         }
     }
